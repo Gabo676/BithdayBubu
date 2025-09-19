@@ -1628,3 +1628,22 @@ audio {
     		padding: 0 5px !important;
     	}
     }
+
+/* Estilos para el audio en móviles */
+.song {
+	position: fixed;
+	top: 10px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10000;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, 0.9);
+	backdrop-filter: blur(10px);
+	padding: 5px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Ocultar controles inicialmente */
+.song:not([controls]) {
+	display: none !important;
+}

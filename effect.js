@@ -3,6 +3,25 @@ $(window).load(function(){
 	$('.container').fadeIn('fast');
 });
 $('document').ready(function(){
+		// Detectar dispositivo móvil
+		var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+		
+		// Función para inicializar audio en móviles
+		function initMobileAudio() {
+			if (isMobile) {
+				var audio = $('.song')[0];
+				if (audio) {
+					// Precargar audio en móviles
+					audio.load();
+					// Mostrar mensaje informativo
+					console.log('Mobile device detected - audio will need user interaction');
+				}
+			}
+		}
+		
+		// Inicializar audio móvil
+		initMobileAudio();
+
 		var vw;
 		$(window).resize(function(){
 			 vw = $(window).width()/2;
@@ -30,7 +49,48 @@ $('document').ready(function(){
 	});
 	$('#play').click(function(){
 		var audio = $('.song')[0];
-        audio.play();
+		// Mejorar compatibilidad móvil
+		if (audio) {
+			// Resetear audio para asegurar que esté listo
+			audio.currentTime = 0;
+			
+			// Intentar reproducir y manejar errores
+			var playPromise = audio.play();
+			if (playPromise !== undefined) {
+				playPromise
+					.then(() => {
+						// Reproducción exitosa
+						console.log('Audio playing successfully');
+						// Ocultar controles si se reproduce automáticamente
+						audio.controls = false;
+						$(audio).hide();
+					})
+					.catch(error => {
+						// Error en reproducción - mostrar controles
+						console.log('Auto-play was prevented, showing controls');
+						audio.controls = true;
+						$(audio).show().css('display', 'block');
+						
+						// Agregar evento para ocultar controles cuando empiece a sonar
+						$(audio).one('play', function() {
+							setTimeout(() => {
+								if (!audio.paused) {
+									audio.controls = false;
+									$(audio).hide();
+								}
+							}, 3000); // Ocultar después de 3 segundos
+						});
+					});
+			} else {
+				// Fallback para navegadores más antiguos
+				try {
+					audio.play();
+				} catch (e) {
+					audio.controls = true;
+					$(audio).show();
+				}
+			}
+		}
         $('#bulb_blue').addClass('bulb-glow-blue-after');
 		$('#bulb_red').addClass('bulb-glow-red-after');
 		$('#bulb_blue2').addClass('bulb-glow-blue-after');
